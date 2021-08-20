@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+	border : 5px solid black;
+    background-color: black;
+    position: fixed;
+    left: 480px;
+    top: 25px;
+}
+button { 
+	background-color : black;
+	font-size : 20px;
+	font-family : Cursive;
+}
+h1 {
+	font-family : Cursive;
+}
+p {
+	font-size : 40px;
+	font-family : Cursive;
+	position : fixed;
+	left: 980px;
+    top: 25px;
+}
+a {
+	color : white;
+}
+.restart {
+	background-color : blue;
+	position : absolute;
+	left : 1000px;
+	top : 480px 
+}
+.exit {
+	background-color : red;
+	position : absolute;
+	left : 1200px;
+	top : 480px 
+}
+</style>
+</head>
+<body onload="startGame()">
+<script>
+
+var myGamePiece;
+var myGamePieceTwo;
+var myObstacles = [];
+var myScore;
+var myReferenceLine=[]; 
+
+function startGame() {
+    myGamePiece = new component(30, 30, "red", 40, 605);
+	myGamePieceTwo = new component(30, 30, "blue", 240, 605);
+	myReferenceLine[0] = new component(600, 3, "white", 0, 30);
+	myReferenceLine[1] = new component(3, 630, "white", 100, 30);
+	myReferenceLine[2] = new component(3, 630, "white", 200, 30);
+	myReferenceLine[3] = new component(3, 630, "white", 300, 30);
+	
+    myScore = new component("18px", "Consolas", "white", 160, 15, "text");
+    myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 400;
+        this.canvas.height = 650;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 20);
+		window.addEventListener('keydown', function (e) {
+            myGameArea.key = e.keyCode;
+        })
+        window.addEventListener('keyup', function (e) {
+            myGameArea.key = false;
+        })
+        },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+function component(width, height, color, x, y, type) {
+    this.type = type;
+    this.score = 0;
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;
+    this.update = function() {
+        ctx = myGameArea.context;
+        if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    this.newPos = function() {
+        myGamePiece.push(new component(5, 45, "red", 100,200 ))
+       myGamePiece.push(new component(5, 45, "green", 100,200 ))
+    }
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright) ) {
+            crash = false;
+        }
+
+        return crash;
+    }
+}
+
+function updateGameArea() {
+    var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+    for (i = 0; i < myObstacles.length; i += 1) {
+        if (myGamePiece.crashWith(myObstacles[i]) || myGamePieceTwo.crashWith(myObstacles[i])) {
+            return;
+			
+        } 
+		
+    }
+    myGameArea.clear();
+    myGameArea.frameNo += 1;
+    if (myGameArea.frameNo == 1 || everyinterval(150)) {
+		obstaclePosOne = Math.floor(Math.random() * 10);
+		obstaclePosTwo = Math.floor(Math.random() * 10)+20+obstaclePosOne;
+		obstaclePosThree = Math.floor(Math.random() * 10)+20+obstaclePosTwo;
+		obstaclePosFour = Math.floor(Math.random() * 10)+20+obstaclePosThree;
+		randomGapOne = Math.floor(Math.random() * 33)+70
+		randomGapTwo = Math.floor(Math.random() * 63)+70
+		randomGapThree = Math.floor(Math.random() * 45)+17
+
+		myObstacles.push(new component(100, 7, "Yellow", 00, obstaclePosOne-randomGapOne));
+		myObstacles.push(new component(100, 7, "#7fff00",100 , obstaclePosFour-70));
+		myObstacles.push(new component(100, 7, "Yellow",200 , obstaclePosOne-randomGapTwo));
+		myObstacles.push(new component(100, 7, "#7fff00", 300, obstaclePosFour+randomGapThree-70));
+
+    }
+    for (i = 0; i < myObstacles.length; i += 1) {
+		var speed = myGameArea.frameNo/1000 * 0.1;
+        myObstacles[i].y += 2+speed;
+        myObstacles[i].update();
+    }
+	
+	myScore.text="SCORE:" + i*25;
+    myScore.update();
+
+
+
+    if (myGameArea.key && myGameArea.key == 37) {myGamePiece = new component(10, 10, "red", 140, 605)}
+    if (myGameArea.key && myGameArea.key == 39) {myGamePiece = new component(10, 10, "red", 40, 605)}
+	if (myGameArea.key && myGameArea.key == 65) {myGamePieceTwo = new component(10, 10, "blue", 340, 605)}
+    if (myGameArea.key && myGameArea.key == 68) {myGamePieceTwo = new component(10, 10, "blue", 240, 605)}
+    myGamePiece.update();
+	myGamePieceTwo.update();
+	for (i = 0; i < 4; i += 1) {
+	myReferenceLine[i].update();
+	}
+
+}
+
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    return false;
+}
+
+</script>
+<h1> BRAINSTROM </h1>
+<p> Game controls <br>
+red <br> --> left arrow to move right. <br> --> right arrow to move left.
+<br> blue <br> --> a to move left <br> --> d to move right.
+</p>
+<button class = "restart"><a href = "mindSet.html">  RESTART </button>
+<br><br><br>
+<button class = "exit"><a href = "StartingPage.html">  EXIT </button>
+</body>
+</body>
+</html>
