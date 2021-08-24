@@ -4,10 +4,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <style>
 canvas {
-	border : 5px solid black;
+    border:4px solid black;
     background-color: black;
-    position: fixed;
-    left: 480px;
+    position: absolute;
+    left: 580px;
     top: 25px;
 }
 button { 
@@ -40,34 +40,35 @@ a {
 	left : 1200px;
 	top : 480px 
 }
+
 </style>
 </head>
 <body onload="startGame()">
 <script>
 
 var myGamePiece;
-var myGamePieceTwo;
 var myObstacles = [];
 var myScore;
-var myReferenceLine=[]; 
+var myref = [];
+var scored = 0;
 
 function startGame() {
-    myGamePiece = new component(30, 30, "red", 40, 605);
-	myGamePieceTwo = new component(30, 30, "blue", 240, 605);
-	myReferenceLine[0] = new component(600, 3, "white", 0, 30);
-	myReferenceLine[1] = new component(3, 630, "white", 100, 30);
-	myReferenceLine[2] = new component(3, 630, "white", 200, 30);
-	myReferenceLine[3] = new component(3, 630, "white", 300, 30);
-	
-    myScore = new component("18px", "Consolas", "white", 160, 15, "text");
+    myGamePiece = new component(10, 10, "white", 120, 650);
+	myref[0] = new component(250, 2, "red", 0, 20);
+	myref[1] = new component(250, 2, "red", 0, 690);
+	myref[2] = new component(250, 2, "white", 0, 110);
+	myref[3] = new component(250, 2, "white", 0, 600);
+
+	 
+    myScore = new component("15px", "Cursive", "white", 60, 12, "text");
     myGameArea.start();
 }
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
-        this.canvas.width = 400;
-        this.canvas.height = 650;
+        this.canvas.width = 200;
+        this.canvas.height = 710;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.frameNo = 0;
@@ -105,8 +106,8 @@ function component(width, height, color, x, y, type) {
         }
     }
     this.newPos = function() {
-        myGamePiece.push(new component(5, 45, "red", 100,200 ))
-       myGamePiece.push(new component(5, 45, "green", 100,200 ))
+        this.x += this.speedX;
+        this.y += this.speedY;        
     }
     this.crashWith = function(otherobj) {
         var myleft = this.x;
@@ -121,74 +122,97 @@ function component(width, height, color, x, y, type) {
         if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright) ) {
             crash = false;
         }
-
+		if((myleft > 200) || (myright < 0) || (mytop < 20) || (mybottom > 690)) {
+		crash = true;
+		}
         return crash;
     }
+	
+	this.scoredValue = function(scored) {
+	 var myleft = this.x;
+     var myright = this.x + (this.width);
+     var mytop = this.y;
+     var mybottom = this.y + (this.height);
+	 var count = false;
+     if((mytop < 108) && (scored%2 == 0)) {
+	    count = true;
+		
+	   }
+	    if((mybottom > 612) && (scored%2 == 1)) {
+	    count = true;
+		
+	   }
+	   return count;
+	
+	}
+	
 }
 
 function updateGameArea() {
     var x, height, gap, minHeight, maxHeight, minGap, maxGap;
     for (i = 0; i < myObstacles.length; i += 1) {
-        if (myGamePiece.crashWith(myObstacles[i]) || myGamePieceTwo.crashWith(myObstacles[i])) {
+        if (myGamePiece.crashWith(myObstacles[i])) {
             return;
 			
         } 
-		
     }
     myGameArea.clear();
     myGameArea.frameNo += 1;
     if (myGameArea.frameNo == 1 || everyinterval(150)) {
-		obstaclePosOne = Math.floor(Math.random() * 10);
-		obstaclePosTwo = Math.floor(Math.random() * 10)+20+obstaclePosOne;
-		obstaclePosThree = Math.floor(Math.random() * 10)+20+obstaclePosTwo;
-		obstaclePosFour = Math.floor(Math.random() * 10)+20+obstaclePosThree;
-		randomGapOne = Math.floor(Math.random() * 33)+70
-		randomGapTwo = Math.floor(Math.random() * 63)+70
-		randomGapThree = Math.floor(Math.random() * 45)+17
-
-		myObstacles.push(new component(100, 7, "Yellow", 00, obstaclePosOne-randomGapOne));
-		myObstacles.push(new component(100, 7, "#7fff00",100 , obstaclePosFour-70));
-		myObstacles.push(new component(100, 7, "Yellow",200 , obstaclePosOne-randomGapTwo));
-		myObstacles.push(new component(100, 7, "#7fff00", 300, obstaclePosFour+randomGapThree-70));
-
+        xred =  Math.floor(Math.random() * 10) + 250;
+		xblue =  Math.floor(Math.random() * 50) + 250;
+		xgreen =  Math.floor(Math.random() * 75) + 250;
+		xyellow =  Math.floor(Math.random() * 100) + 250;
+ 
+		obstaclePos = Math.floor(Math.random() * 100) + 125;
+		obstaclePosTwo = Math.floor(Math.random() * 100) + 250; 
+		obstaclePosThree = Math.floor(Math.random() * 100) + 375;
+		obstaclePosFour = Math.floor(Math.random() * 100) + 440;
+		
+	    myObstacles.push(new component(3, 65, "red", xred, obstaclePos));
+	    myObstacles.push(new component(3, 65, "blue", xblue, obstaclePosTwo));
+		myObstacles.push(new component(3, 65, "#7fff00", xgreen, obstaclePosThree));
+	    myObstacles.push(new component(3, 60, "yellow", xyellow, obstaclePosFour));
     }
     for (i = 0; i < myObstacles.length; i += 1) {
-		var speed = myGameArea.frameNo/1000 * 0.1;
-        myObstacles[i].y += 2+speed;
+		myObstacles[i].x += -((scored/7)+0.5);
         myObstacles[i].update();
     }
-	
-	myScore.text="SCORE:" + i*25;
-    myScore.update();
 
 
-
-    if (myGameArea.key && myGameArea.key == 37) {myGamePiece = new component(10, 10, "red", 140, 605)}
-    if (myGameArea.key && myGameArea.key == 39) {myGamePiece = new component(10, 10, "red", 40, 605)}
-	if (myGameArea.key && myGameArea.key == 65) {myGamePieceTwo = new component(10, 10, "blue", 340, 605)}
-    if (myGameArea.key && myGameArea.key == 68) {myGamePieceTwo = new component(10, 10, "blue", 240, 605)}
+	if (myGameArea.key && myGameArea.key == 37) {myGamePiece.speedX = -1; }
+    if (myGameArea.key && myGameArea.key == 39) {myGamePiece.speedX = 1; }
+    if (myGameArea.key && myGameArea.key == 38) {myGamePiece.speedY = -1; }
+    if (myGameArea.key && myGameArea.key == 40) {myGamePiece.speedY = 1; }
+    myGamePiece.newPos();
     myGamePiece.update();
-	myGamePieceTwo.update();
-	for (i = 0; i < 4; i += 1) {
-	myReferenceLine[i].update();
+	for(i = 0; i<myref.length; i++) {
+	 	myref[i].update();
 	}
 
+		
+    if(myGamePiece.scoredValue(scored)) { 
+	  scored = scored + 1;
+	}
+	myScore.text="SCORE:" + scored;
+	myScore.update();
 }
+
 
 function everyinterval(n) {
     if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
     return false;
 }
 
+
 </script>
-<h1> BRAINSTROM </h1>
+<h1> RUNOUT </h1>
 <p> Game controls <br>
-red <br> --> left arrow to move right. <br> --> right arrow to move left.
-<br> blue <br> --> a to move left <br> --> d to move right.
+ <br> --> left arrow to move left. <br> --> right arrow to move right.
+ <br> --> up arrow to move upside <br> --> down arrow to move down.
 </p>
-<button class = "restart"><a href = "mindSet.html">  RESTART </button>
+<button class = "restart"><a href = "RunOut.html">  RESTART </button>
 <br><br><br>
 <button class = "exit"><a href = "StartingPage.html">  EXIT </button>
-</body>
 </body>
 </html>
