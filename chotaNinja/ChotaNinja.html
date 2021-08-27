@@ -158,7 +158,7 @@ function updateGameArea() {
 	
 		obstaclePos = Math.floor(Math.random() * 211) + 880;
 		xSize = Math.floor(Math.random() * 10) + 5;
-        myObstacles.push(new component(xSize, 180, "red", obstaclePos, 150));
+        myObstacles.push(new component(xSize, 140, "red", obstaclePos, 150));
   
     }
     for (i = 0; i < myObstacles.length; i += 1) {
@@ -184,7 +184,7 @@ function accelerate(n) {
 </script>
 <h1>CHOTA - NINJA</h1>
 <br>
-<button onmousedown="accelerate(-0.7)" onmouseup="accelerate(0.25)">JUMP</button>
+<button onmousedown="accelerate(-1.2)" onmouseup="accelerate(0.25)">JUMP</button>
 <a class="restart" href = "ChotaNinja.html">  RESTART </button>
 <br><br><br>
 <a class="exit" href = "StartingPage.html">  EXIT </button>
